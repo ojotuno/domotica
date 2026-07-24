@@ -1,0 +1,10 @@
+{
+  "devices": [
+    {
+      "id": "relay1",
+      "label": "Relé 1",
+      "ip": "192.168.1.50",
+      "endpoint": "/relay/1"
+    }
+  ]
+}

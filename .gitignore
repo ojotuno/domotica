@@ -1,0 +1,4 @@
+node_modules/
+backend-cpp/build/
+backend-cpp/vcpkg_installed/
+.vscode/settings.json

@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel de control</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #14171a;
+    --panel: #1c2024;
+    --panel-raised: #22262b;
+    --border: #2c3136;
+    --text: #e7e9ea;
+    --text-dim: #7d8790;
+    --on: #ffb020;
+    --on-glow: rgba(255, 176, 32, 0.35);
+    --off: #3a4046;
+    --danger: #e05252;
+    --radius: 10px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body{
+    margin:0;
+    min-height:100vh;
+    background:
+      radial-gradient(circle at 20% -10%, #1a2b33 0%, transparent 45%),
+      var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 24px;
+  }
+
+  h1, h2, .brand { font-family: 'Space Grotesk', sans-serif; }
+
+  /* ---------- LOGIN ---------- */
+  .login-card{
+    width: 100%;
+    max-width: 360px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 36px 32px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  }
+
+  .brand{
+    font-size: 13px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin: 0 0 4px;
+  }
+
+  .login-card h1{
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0 0 28px;
+  }
+
+  label{
+    display:block;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+
+  input{
+    width:100%;
+    background: #101316;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 11px 12px;
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    margin-bottom: 18px;
+    outline: none;
+    transition: border-color .15s;
+  }
+  input:focus{ border-color: var(--on); }
+
+  button.primary{
+    width:100%;
+    background: var(--on);
+    color: #1a1300;
+    border: none;
+    border-radius: 6px;
+    padding: 12px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    cursor:pointer;
+    transition: filter .15s, transform .1s;
+  }
+  button.primary:hover{ filter: brightness(1.08); }
+  button.primary:active{ transform: scale(0.98); }
+
+  .error-msg{
+    color: var(--danger);
+    font-size: 12.5px;
+    margin: -8px 0 16px;
+    min-height: 16px;
+  }
+
+  /* ---------- DASHBOARD ---------- */
+  .dashboard{
+    width: 100%;
+    max-width: 960px;
+  }
+
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom: 28px;
+  }
+
+  .topbar h1{ font-size: 20px; margin:0; font-weight:600; }
+  .topbar .brand{ margin-bottom: 2px; }
+
+  .logout-btn{
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    cursor:pointer;
+    transition: border-color .15s, color .15s;
+  }
+  .logout-btn:hover{ border-color: var(--danger); color: var(--danger); }
+
+  .grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 18px;
+  }
+
+  /* Tarjeta estilo placa de panel industrial */
+  .widget-card{
+    position: relative;
+    background: linear-gradient(180deg, var(--panel-raised), var(--panel));
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px 20px 20px;
+  }
+
+  .widget-card::before,
+  .widget-card::after{
+    content:"";
+    position:absolute;
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: #3a4046;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,0.6);
+    top: 10px;
+  }
+  .widget-card::before{ left: 10px; }
+  .widget-card::after{ right: 10px; }
+
+  .widget-label{
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0 0 18px;
+  }
+
+  .widget-status-row{
+    display:flex;
+    align-items:center;
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+
+  .led{
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: var(--off);
+    transition: background .2s, box-shadow .2s;
+  }
+  .led.on{
+    background: var(--on);
+    box-shadow: 0 0 8px 2px var(--on-glow);
+  }
+
+  .status-text{
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+  .status-text.on{ color: var(--on); }
+
+  /* Interruptor tipo rocker */
+  .rocker{
+    width: 100%;
+    height: 46px;
+    border-radius: 8px;
+    background: #101316;
+    border: 1px solid var(--border);
+    position: relative;
+    cursor: pointer;
+    padding: 4px;
+    display:flex;
+  }
+  .rocker-thumb{
+    width: 50%;
+    height: 100%;
+    border-radius: 6px;
+    background: var(--off);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: #14171a;
+    transition: transform .18s ease, background .18s ease;
+  }
+  .rocker.on .rocker-thumb{
+    transform: translateX(100%);
+    background: var(--on);
+  }
+
+  .hidden{ display:none; }
+
+  .empty-state{
+    color: var(--text-dim);
+    font-size: 13px;
+    text-align:center;
+    padding: 40px 0;
+  }
+</style>
+</head>
+<body>
+
+  <!-- LOGIN VIEW -->
+  <div id="login-view" class="login-card">
+    <p class="brand">Panel de control</p>
+    <h1>Iniciar sesión</h1>
+    <form id="login-form">
+      <label for="username">Usuario</label>
+      <input id="username" name="username" autocomplete="username" value="admin">
+      <label for="password">Contraseña</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" value="admin">
+      <p class="error-msg" id="login-error"></p>
+      <button class="primary" type="submit">Entrar</button>
+    </form>
+  </div>
+
+  <!-- DASHBOARD VIEW -->
+  <div id="dashboard-view" class="dashboard hidden">
+    <div class="topbar">
+      <div>
+        <p class="brand">Panel de control</p>
+        <h1>Dispositivos</h1>
+      </div>
+      <button class="logout-btn" id="logout-btn">Cerrar sesión</button>
+    </div>
+    <div class="grid" id="widget-grid"></div>
+  </div>
+
+<script>
+const API = 'http://localhost:3001';
+
+const loginView = document.getElementById('login-view');
+const dashboardView = document.getElementById('dashboard-view');
+const loginForm = document.getElementById('login-form');
+const loginError = document.getElementById('login-error');
+const logoutBtn = document.getElementById('logout-btn');
+const widgetGrid = document.getElementById('widget-grid');
+
+async function checkSession(){
+  const res = await fetch(`${API}/api/session`, { credentials: 'include' });
+  const data = await res.json();
+  if(data.user){
+    showDashboard();
+  } else {
+    showLogin();
+  }
+}
+
+function showLogin(){
+  loginView.classList.remove('hidden');
+  dashboardView.classList.add('hidden');
+}
+
+async function showDashboard(){
+  loginView.classList.add('hidden');
+  dashboardView.classList.remove('hidden');
+  await loadWidgets();
+}
+
+loginForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  loginError.textContent = '';
+  const username = document.getElementById('username').value;
+  const password = document.getElementById('password').value;
+
+  try{
+    const res = await fetch(`${API}/api/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ username, password })
+    });
+    if(!res.ok){
+      const data = await res.json();
+      loginError.textContent = data.error || 'Error al iniciar sesión';
+      return;
+    }
+    await showDashboard();
+  } catch(err){
+    loginError.textContent = 'No se pudo conectar con el backend';
+  }
+});
+
+logoutBtn.addEventListener('click', async () => {
+  await fetch(`${API}/api/logout`, { method: 'POST', credentials: 'include' });
+  showLogin();
+});
+
+async function loadWidgets(){
+  widgetGrid.innerHTML = '<p class="empty-state">Cargando...</p>';
+  try{
+    const res = await fetch(`${API}/api/widgets`, { credentials: 'include' });
+    if(!res.ok){ showLogin(); return; }
+    const data = await res.json();
+    renderWidgets(data.widgets);
+  } catch(err){
+    widgetGrid.innerHTML = '<p class="empty-state">No se pudo conectar con el backend</p>';
+  }
+}
+
+function renderWidgets(widgets){
+  if(!widgets.length){
+    widgetGrid.innerHTML = '<p class="empty-state">No hay dispositivos configurados</p>';
+    return;
+  }
+
+  widgetGrid.innerHTML = '';
+  widgets.forEach(w => {
+    const card = document.createElement('div');
+    card.className = 'widget-card';
+    card.innerHTML = `
+      <p class="widget-label">${w.label}</p>
+      <div class="widget-status-row">
+        <span class="led ${w.state ? 'on' : ''}" data-role="led"></span>
+        <span class="status-text ${w.state ? 'on' : ''}" data-role="status-text">${w.state ? 'Encendido' : 'Apagado'}</span>
+      </div>
+      <div class="rocker ${w.state ? 'on' : ''}" data-role="rocker" data-id="${w.id}">
+        <div class="rocker-thumb">${w.state ? 'ON' : 'OFF'}</div>
+      </div>
+    `;
+    widgetGrid.appendChild(card);
+  });
+
+  document.querySelectorAll('[data-role="rocker"]').forEach(rocker => {
+    rocker.addEventListener('click', () => toggleDevice(rocker));
+  });
+}
+
+async function toggleDevice(rocker){
+  const id = rocker.dataset.id;
+  rocker.style.pointerEvents = 'none';
+  try{
+    const res = await fetch(`${API}/api/toggle/${id}`, {
+      method: 'POST',
+      credentials: 'include'
+    });
+    const data = await res.json();
+    if(!res.ok){
+      alert(data.error || 'Error al cambiar el estado');
+      return;
+    }
+    updateWidgetUI(rocker, data.state);
+  } catch(err){
+    alert('No se pudo contactar con el backend');
+  } finally {
+    rocker.style.pointerEvents = 'auto';
+  }
+}
+
+function updateWidgetUI(rocker, state){
+  const card = rocker.closest('.widget-card');
+  const led = card.querySelector('[data-role="led"]');
+  const statusText = card.querySelector('[data-role="status-text"]');
+  const thumb = rocker.querySelector('.rocker-thumb');
+
+  rocker.classList.toggle('on', state);
+  led.classList.toggle('on', state);
+  statusText.classList.toggle('on', state);
+  statusText.textContent = state ? 'Encendido' : 'Apagado';
+  thumb.textContent = state ? 'ON' : 'OFF';
+}
+
+checkSession();
+</script>
+</body>
+</html>
